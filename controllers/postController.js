@@ -30,6 +30,11 @@ function show(req, res) {
   //   description: "Dettagli dei posts " + id,
   //   data: post,
   // });
+  const { id } = req.params;
+  connection.query(`SELECT * FROM posts WHERE id=?`, [id], (err, results) => {
+    if (err) return res.status(404).json({ error: `Post not found` });
+    res.json(results);
+  });
 }
 
 function create(req, res) {
