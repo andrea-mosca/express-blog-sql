@@ -79,6 +79,11 @@ function destroy(req, res) {
   // posts.splice(postIndex, 1);
   // console.log(posts);
   // res.sendStatus(204);
+  const { id } = req.params;
+  connection.query(`DELETE FROM posts WHERE id=?`, [id], (err) => {
+    if (err) return res.status(500).json({ error: `Failed to delete post` });
+    res.sendStatus(204);
+  });
 }
 
 module.exports = { index, show, create, update, destroy };
