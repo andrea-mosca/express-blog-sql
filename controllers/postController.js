@@ -32,7 +32,9 @@ function show(req, res) {
   // });
   const { id } = req.params;
   connection.query(`SELECT * FROM posts WHERE id=?`, [id], (err, results) => {
-    if (err) return res.status(404).json({ error: `Post not found` });
+    if (err) return res.status(500).json({ error: `Database query failed` });
+    if (results.length === 0)
+      return res.status(404).json({ error: `post not found` });
     res.json(results);
   });
 }
