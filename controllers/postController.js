@@ -31,11 +31,33 @@ function show(req, res) {
   //   data: post,
   // });
   const { id } = req.params;
-  connection.query(`SELECT * FROM posts WHERE id=?`, [id], (err, results) => {
+  const postSql = `SELECT * FROM posts WHERE id=?`;
+
+  const tagsSql = `
+  SELECT tags.label
+  FROM posts
+
+  INNER JOIN post_tag
+  ON posts.id=post_tag.post_id
+
+  INNER JOIN tags
+  ON tags.id= post_tag.tag_id
+
+  WHERE posts.id= ?;
+  `;
+
+  connection.query(postSql, [id], (err, postsResults) => {
     if (err) return res.status(500).json({ error: `Database query failed` });
-    if (results.length === 0)
+    if (postsResults.length === 0)
       return res.status(404).json({ error: `post not found` });
-    res.json(results);
+
+    const post = postsResults[0];
+
+    connection.query(tagsSql, [id], (err, tagsResults) => {
+      if (err) return res.status(500).json({ error: `Database query failed` });
+      post.tags = tagsResults;
+      res.json(post);
+    });
   });
 }
 
